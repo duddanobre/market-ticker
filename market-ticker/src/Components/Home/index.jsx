@@ -137,27 +137,22 @@ return(
       </div>
     </Header>
     <Content className="site-layout" style={{ padding: '0 50px', marginTop: 64, flex:1 }}>
-      <Breadcrumb style={{ margin: '16px 0' }}>
-        <Breadcrumb.Item>Home</Breadcrumb.Item>
-        <Breadcrumb.Item>List</Breadcrumb.Item>
-        <Breadcrumb.Item>App</Breadcrumb.Item>
-      </Breadcrumb>
       <div className="site-layout-background" style={{ padding: 24, minHeight: 380 }}>
         <Tabs defaultActiveKey="1" onTabClick={(key)=>{setTab(key)}}>
             <TabPane tab="Popular" key="1">
-              <Table columns={columns} dataSource={instruments}></Table>
+              <Table columns={columns} dataSource={instruments} pagination={false}></Table>
             </TabPane>
             <TabPane tab="Forex" key="2">
-              <Table columns={columns} dataSource={instruments}></Table>
+              <Table columns={columns} dataSource={instruments} pagination={false}></Table>
             </TabPane>
             <TabPane tab="Commodities" key="3">
-              <Table columns={columns} dataSource={instruments}></Table>
+              <Table columns={columns} dataSource={instruments} pagination={false}></Table>
             </TabPane>
             <TabPane tab="Share CFDs" key="4">
-              <Table columns={columns} dataSource={instruments}></Table>
+              <Table columns={columns} dataSource={instruments} pagination={false}></Table>
             </TabPane>
             <TabPane tab="Equities" key="5">
-              <Table columns={columns} dataSource={instruments}></Table>
+              <Table columns={columns} dataSource={instruments} pagination={false}></Table>
             </TabPane>
         </Tabs>
       </div>
