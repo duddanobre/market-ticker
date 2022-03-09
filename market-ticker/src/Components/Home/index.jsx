@@ -8,8 +8,86 @@ import {instrumentsService} from '../../services/apiServices';
 const { Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
 
+const namesForex = ['EUR','USD', 'GBP', 'JPY'];
+const namesPopular = ['EUR','USD', 'BTC', 'ETH'];
+const namesCommodities = ['EUR','TMT', 'BTC', 'ETH'];
+
 export default function Home(){
   const [instruments, setInstruments] = useState([]);
+  const [cfd, setCfd] = useState([]);
+  const [tab, setTab] = useState('1');
+
+  useEffect(async () => {
+    setTimeout(() => {
+      handleInstruments();
+    }, 1000);
+  }, [instruments,tab])
+
+  async function handleInstruments () {
+    await instrumentsService.getInstruments()
+      .then(data => {
+        if (tab === '1') {
+          const lisValues = Object.values(data).filter(cod => (namesPopular.includes(cod.code)));
+          CalcSpread(lisValues);
+        }
+        if (tab === '2') {
+          const lisValues = Object.values(data).filter(cod => (namesForex.includes(cod.code)));
+          CalcSpread(lisValues);
+        }
+        if (tab === '3') {
+          const lisValues = Object.values(data).filter(cod => (namesCommodities.includes(cod.code)));
+          CalcSpread(lisValues);
+        }
+        if (tab === '4') {
+          handleCfd()
+        }
+        if (tab === '5') {
+          CalcSpread(Object.values(data));
+        }
+      })
+      .catch(() => 'Deu erro')
+  };
+  async function handleCfd () {
+    await instrumentsService.getCfds()
+      .then(data => {
+          CalcSpread(Object.values(data));
+          defName(Object.values(data));
+      })
+      .catch(() => 'Deu erro')
+  };
+
+  const CalcSpread = ((instruments) => {
+    for(const i in instruments){
+      Object.defineProperty(instruments[i], 'spread', {
+        value: (instruments[i].ask - instruments[i].bid).toFixed(3),
+        writable: true,
+        enumerable: true,
+        configurable: true
+      });
+    }
+    setInstruments(instruments);
+  });
+
+  const defName = ((cfd) => {
+    for(const i in cfd){
+      Object.defineProperty(cfd[0], 'name', {
+        value: 'Alibaba',
+      });
+      Object.defineProperty(cfd[1], 'name', {
+        value: 'Apple',
+      });
+      Object.defineProperty(cfd[2], 'name', {
+        value: 'CBA',
+      });
+      Object.defineProperty(cfd[3], 'name', {
+        value: 'Facebook',
+      });
+      Object.defineProperty(cfd[4], 'name', {
+        value: 'Tesla',
+      });
+    }
+    setCfd(cfd);
+  });
 
   const columns = [
     {
@@ -32,9 +110,9 @@ export default function Home(){
     },
     {
       title: 'Spread',
-      dataIndex: 'varBid',
-      key: 'varBid',
-      render: varBid => <div>{varBid}</div>,
+      dataIndex: 'spread',
+      key: 'spread',
+      render: spread => <div>{(spread)}</div>
     },
     {
       title: '',
@@ -46,15 +124,6 @@ export default function Home(){
       ),
     },
   ];
-
-  useEffect(async () => {
-    await instrumentsService.getInstruments()
-          .then(data => {
-              setInstruments(Object.values(data));
-              console.log('instrumentos',Object.values(data));
-          })
-          .catch(() => 'Deu erro')
-  }, [instruments])
 
 return(
   <Layout>
@@ -74,9 +143,9 @@ return(
         <Breadcrumb.Item>App</Breadcrumb.Item>
       </Breadcrumb>
       <div className="site-layout-background" style={{ padding: 24, minHeight: 380 }}>
-        <Tabs defaultActiveKey="1">
+        <Tabs defaultActiveKey="1" onTabClick={(key)=>{setTab(key)}}>
             <TabPane tab="Popular" key="1">
-                  <Table columns={columns} dataSource={instruments}></Table>
+              <Table columns={columns} dataSource={instruments}></Table>
             </TabPane>
             <TabPane tab="Forex" key="2">
               <Table columns={columns} dataSource={instruments}></Table>
@@ -84,7 +153,7 @@ return(
             <TabPane tab="Commodities" key="3">
               <Table columns={columns} dataSource={instruments}></Table>
             </TabPane>
-            <TabPane tab="Index CFDs" key="4">
+            <TabPane tab="Share CFDs" key="4">
               <Table columns={columns} dataSource={instruments}></Table>
             </TabPane>
             <TabPane tab="Equities" key="5">
@@ -93,7 +162,7 @@ return(
         </Tabs>
       </div>
     </Content>
-    <Footer style={{ textAlign: 'center' }}>Ant Design ©2018 Created by Ant UED</Footer>
+    <Footer style={{ textAlign: 'center' }}>Sistema de monitoramento monetário ©2022 Created by Duda Nobre</Footer>
   </Layout>
 )
 };
